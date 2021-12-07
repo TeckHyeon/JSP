@@ -1,0 +1,23 @@
+package member2;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JDialog;
+
+//검색이 없는 주소 입력시 알림창
+public class DialogBox extends JDialog implements ActionListener{
+	
+	JButton b1;
+	ZipcodeFrame f;
+	public DialogBox(ZipcodeFrame f, String title, String msg) {
+		super(f, true);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

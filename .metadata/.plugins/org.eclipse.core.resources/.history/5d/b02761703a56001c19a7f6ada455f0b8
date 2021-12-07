@@ -1,0 +1,39 @@
+package member2;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Vector;
+
+import ch14.DBConnectionMgr;
+
+public class ZipcodeMgr {
+
+	private DBConnectionMgr pool;
+
+	// 모든 리스트 가져오기
+	public Vector<MemberBean> getMemberList() {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		Vector<MemberBean> vlist = new Vector<MemberBean>();
+		ResultSet rs = null;
+		try {
+			con = pool.getConnection();
+			sql = "SELECT * FROM tblmember2 ";
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				MemberBean bean = new MemberBean(rs.getInt("id"), rs.getString("name"), rs.getString("phone"),
+						rs.getString("address"), rs.getString("team"));
+				vlist.addElement(bean);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return vlist;
+	}
+}

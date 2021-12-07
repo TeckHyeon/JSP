@@ -1,0 +1,154 @@
+package member2;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+import com.mysql.cj.protocol.Resultset;
+
+import ch14.DBConnectionMgr;
+
+public class MemberMgr {
+
+	private DBConnectionMgr pool;
+
+	// 모든 리스트 가져오기
+	public ArrayList<MemberBean> getMemberList() {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		ArrayList<MemberBean> list = new ArrayList<MemberBean>();
+		ResultSet rs = null;
+		try {
+			con = pool.getConnection();
+			sql = "SELECT * FROM tblmember2 ";
+			pstmt = con.prepareStatement(sql);
+			rs=pstmt.executeQuery();
+			
+		while (rs.next()) {
+			MemberBean memberBean = new MemberBean();
+			memberBean.setId(rs.getInt("id"));
+			memberBean.setName(rs.getString("name"));
+			memberBean.setPhone(rs.getString("phone"));
+			memberBean.setAddress(rs.getString("address"));
+			memberBean.setTeam(rs.getString("team"));
+			list.add(memberBean);
+		}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return list;
+	}
+
+	// 저장하기
+	public boolean insertMember(MemberBean bean) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag = false;
+		try {
+			con = pool.getConnection();
+			sql = "insert tblmember2 values(?, ?, ?, ?, ?)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, bean.getId());
+			pstmt.setString(2, bean.getName());
+			pstmt.setString(3, bean.getPhone());
+			pstmt.setString(4, bean.getAddress());
+			pstmt.setString(5, bean.getTeam());
+			
+			pstmt.executeUpdate();
+			int cnt = pstmt.executeUpdate();
+			if(cnt==1) flag = true;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return flag;
+	}
+
+	// 회원 정보(레코드 한개)
+	public MemberBean getMember(int id) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		MemberBean memberBean = null;
+		try {
+			con = pool.getConnection();
+			sql = "SELECT * from tblmember2 where id = ? ";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, id);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				memberBean = new MemberBean();
+				memberBean.setId(rs.getInt("id"));
+				memberBean.setName(rs.getString("name"));
+				memberBean.setPhone(rs.getString("phone"));
+				memberBean.setAddress(rs.getString("address"));
+				memberBean.setTeam(rs.getString("team"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return memberBean;
+	}
+
+	// 수정하기
+	public boolean updateMember(MemberBean bean) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag = false;
+		try {
+			con = pool.getConnection();
+			sql = "update tblmember2 set name=?, phone=?, address=?, team=? where id=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, bean.getName());
+			pstmt.setString(2, bean.getPhone());
+			pstmt.setString(3, bean.getAddress());
+			pstmt.setString(4, bean.getTeam());
+			pstmt.setInt(5, bean.getId());
+			int cnt = pstmt.executeUpdate();
+			if (cnt == 1)
+				flag = true;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return flag;
+	}
+
+	// 삭제하기
+	public boolean deleteMember(int id) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag = false;
+		try {
+			con = pool.getConnection();
+			sql = "delete from tblmember2 where id = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, id);
+			int cnt = pstmt.executeUpdate();
+			if (cnt == 1)
+				flag = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return flag;
+
+	}
+}
